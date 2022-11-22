@@ -1,0 +1,224 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyPnYdBHOUtFXM01YCUKpKQh",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/Monisha09-ds/-/blob/main/simulation%20assignemnt%2001\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 11,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "fjhDgd3iltF5",
+        "outputId": "84e97bc7-96ef-4b9b-c007-1d55898c6962"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "10 10\n",
+            "+----------+-----+----+----+-----+------+-----+------+--------------+\n",
+            "| Customer | IAT | AT | ST | TSB | TCWQ | TSE | TCSS | System Ideal |\n",
+            "+----------+-----+----+----+-----+------+-----+------+--------------+\n",
+            "|    1     |  1  | 1  | 9  |  1  |  0   |  9  |  9   |      0       |\n",
+            "|    2     |  7  | 8  | 8  |  9  |  1   |  17 |  9   |      0       |\n",
+            "|    3     |  8  | 16 | 6  |  17 |  1   |  23 |  7   |      0       |\n",
+            "|    4     |  1  | 17 | 2  |  23 |  6   |  25 |  8   |      0       |\n",
+            "|    5     |  4  | 21 | 4  |  25 |  4   |  29 |  8   |      0       |\n",
+            "|    6     |  8  | 29 | 6  |  29 |  0   |  35 |  6   |      0       |\n",
+            "|    7     |  8  | 37 | 1  |  37 |  0   |  38 |  1   |      2       |\n",
+            "|    8     |  5  | 42 | 7  |  42 |  0   |  49 |  7   |      4       |\n",
+            "|    9     |  3  | 45 | 3  |  49 |  4   |  52 |  7   |      0       |\n",
+            "|    10    |  1  | 46 | 6  |  52 |  6   |  58 |  12  |      0       |\n",
+            "+----------+-----+----+----+-----+------+-----+------+--------------+\n"
+          ]
+        }
+      ],
+      "source": [
+        "import random \n",
+        "\n",
+        "random.seed(10)\n",
+        "\n",
+        "size = 10\n",
+        "\n",
+        "customer = [i for i in range(1,size+1)]\n",
+        "\n",
+        "inter_arrival_time = [random.randrange(1,10) for i in range(size)]\n",
+        "\n",
+        "service_time = [random.randrange(1,10) for i in range(size)]\n",
+        "print(len(inter_arrival_time),len(service_time))\n",
+        "\n",
+        "arrival_time = [0 for i in range(size)]\n",
+        "\n",
+        "arrival_time[0] = inter_arrival_time[0]\n",
+        "for i in range(1,size):\n",
+        "     arrival_time[i] = inter_arrival_time[i]+arrival_time[i-1]\n",
+        "Time_Service_Begin = [0 for i in range(size)]\n",
+        "Time_Customer_Waiting_in_Queue = [0 for i in range(size)]\n",
+        "Time_Service_Ends = [0 for i in range(size)]\n",
+        "Time_Customer_Spend_in_System = [0 for i in range(size)]\n",
+        "System_idle = [0 for i in range(size)]\n",
+        "Time_Service_Begin[0] = arrival_time[0]\n",
+        "Time_Service_Ends[0] = service_time[0]\n",
+        "Time_Customer_Spend_in_System[0] = service_time[0]\n",
+        "for i in range(1,size):\n",
+        "\n",
+        " Time_Service_Begin[i] = max(arrival_time[i],Time_Service_Ends[i-1])\n",
+        "\n",
+        " Time_Customer_Waiting_in_Queue[i] = Time_Service_Begin[i]-arrival_time[i]\n",
+        " \n",
+        " Time_Service_Ends[i] = Time_Service_Begin[i] + service_time[i] \n",
+        "\n",
+        " Time_Customer_Spend_in_System[i] = Time_Service_Ends[i] - arrival_time[i]\n",
+        "\n",
+        " if (arrival_time[i]>Time_Service_Ends[i-1]):\n",
+        "     System_idle[i] = arrival_time[i]-Time_Service_Ends[i-1]\n",
+        " else:\n",
+        "     System_idle[i] = 0 \n",
+        " \n",
+        "from prettytable import PrettyTable\n",
+        "x = PrettyTable()\n",
+        "column_names = ['Customer','IAT','AT','ST','TSB','TCWQ','TSE','TCSS','System Ideal']\n",
+        "data = [customer,inter_arrival_time,arrival_time,service_time, Time_Service_Begin, \n",
+        "Time_Customer_Waiting_in_Queue, Time_Service_Ends, Time_Customer_Spend_in_System, \n",
+        "System_idle]\n",
+        "length = len(column_names)\n",
+        "for i in range(length):\n",
+        " x.add_column(column_names[i],data[i])\n",
+        " \n",
+        "print(x)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "Average_waiting_time = (sum(Time_Customer_Waiting_in_Queue)/size)\n",
+        "\n",
+        "no_customer_who_are_waiting = len(list(filter(lambda \n",
+        "x:x>0,Time_Customer_Waiting_in_Queue)))\n",
+        "prob_customer_waiting = no_customer_who_are_waiting / size\n",
+        "\n",
+        "Average_service_time = sum(service_time)/size\n",
+        "\n",
+        "prob_ideal_server = sum(System_idle) / Time_Service_Ends[size-1] \n",
+        "\n",
+        "Average_Time_Between_Arrival = arrival_time[size-1] / (len(arrival_time) - 1)\n",
+        "\n",
+        "average_waiting_time = sum(Time_Customer_Waiting_in_Queue) / no_customer_who_are_waiting\n",
+        "\n",
+        "time_customer_spent = sum(Time_Customer_Spend_in_System)/size\n",
+        "print(\"Average waiting time : {:.2f}\".format(Average_waiting_time))\n",
+        "print('-'*50)\n",
+        "print(\"Probability of customer were waiting : {:.2f}\".format(prob_customer_waiting))\n",
+        "print('-'*50)\n",
+        "print(\"Average service time : {:.2f}\".format(Average_service_time))\n",
+        "print('-'*50)\n",
+        "print(\"Probability of idle server : {:.2f}\".format(prob_ideal_server))\n",
+        "print('-'*50)\n",
+        "print(\"Average Time Between Arrival : {:.2f}\".format(Average_Time_Between_Arrival))\n",
+        "print('-'*50)\n",
+        "print(\"Average waiting time those who wait : {:.2f}\".format(average_waiting_time))\n",
+        "print('-'*50)\n",
+        "print(\"Average time customer spent in the system : {:.2f}\".format(time_customer_spent))\n"
+      ],
+      "metadata": {
+        "id": "Wn6Do6HOmBYS",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "98dbaa72-e95d-4bf6-984b-10d99824173d"
+      },
+      "execution_count": 9,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Average waiting time : 2.20\n",
+            "--------------------------------------------------\n",
+            "Probability of customer were waiting : 0.60\n",
+            "--------------------------------------------------\n",
+            "Average service time : 5.20\n",
+            "--------------------------------------------------\n",
+            "Probability of idle server : 0.10\n",
+            "--------------------------------------------------\n",
+            "Average Time Between Arrival : 5.11\n",
+            "--------------------------------------------------\n",
+            "Average waiting time those who wait : 3.67\n",
+            "--------------------------------------------------\n",
+            "Average time customer spent in the system : 7.40\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [],
+      "metadata": {
+        "id": "MmoabqswmVyV"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "WGhndoHlmBde"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "RdySJTqPmBgS"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "KoxrjztJmBio"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "VkIb42ylmBmD"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
